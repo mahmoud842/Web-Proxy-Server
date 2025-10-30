@@ -8,8 +8,8 @@ if len(sys.argv) <= 1:
 # Create a server socket, bind it to a port and start listening
 tcpSerSock = socket(AF_INET, SOCK_STREAM)
 # Fill in start.
-# tcpSerSock.bind((sys.argv[1], 8888))
-# tcpSerSock.listen(1)
+tcpSerSock.bind((sys.argv[1], 8888))
+tcpSerSock.listen(1)
 # Fill in end.
 
 while 1:
@@ -23,7 +23,7 @@ while 1:
     # Fill in end.
 
     print(message)
-
+    print("bombena")
     # Extract the filename from the given message
     try:
         filename = message.split()[1].partition("/")[2]
@@ -32,9 +32,11 @@ while 1:
         continue
 
     print(filename)
+    print("bombena")
     fileExist = "false"
     filetouse = "/" + filename
     print(filetouse)
+    print("bombena")
 
     try:
         # Check whether the file exists in the cache
@@ -49,6 +51,7 @@ while 1:
         # Fill in start.
         for line in outputdata:
             tcpCliSock.send(line.encode())
+        f.close()
         # Fill in end.
 
         print('Read from cache')
@@ -63,6 +66,7 @@ while 1:
 
             hostn = filename.replace("www.", "", 1)
             print(hostn)
+            print("bombena")
             try:
                 # Connect to the socket to port 80
                 # Fill in start.
@@ -85,6 +89,7 @@ while 1:
                 # Fill in start.
                 tmpFile.write(buffer)
                 tcpCliSock.send(buffer)
+                tmpFile.close()
                 # Fill in end.
 
             except Exception as e:
@@ -99,6 +104,7 @@ while 1:
 
     # Close the client and the server sockets
     tcpCliSock.close()
-    # Fill in start.
-    # tcpSerSock.close()
-    # Fill in end.
+
+# Fill in start.
+tcpSerSock.close()
+# Fill in end.
