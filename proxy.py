@@ -1,5 +1,6 @@
 from socket import *
 import sys
+import os
 
 if len(sys.argv) <= 1:
     print('Usage : "python ProxyServer.py server_ip"\n[server_ip : It is the IP Address Of Proxy Server]')
@@ -23,19 +24,29 @@ while 1:
     message = tcpCliSock.recv(1024).decode()
     # Fill in end.
 
-    print(message)
+    # print(message)
     print("bombena")
-    
-    # Extract the filename from the given message
-    print(message.split()[1])
-    filename = message.split()[1].partition("/")[2]
 
+    # Extract the filename from the given message
+    try:
+        print(message.split()[0])
+        print(message.split()[1])
+        filename = message.split()[1].partition("/")[2]
+    except:
+        continue
+
+    if (filename[0] == '/'):
+        filename = filename[1:]
+    if (filename[-1] == '/'):
+        filename = filename[0:-1]
+    print("fileNames:::")
     print(filename)
     print("bombena")
     fileExist = "false"
     filetouse = "/" + filename
     print(filetouse)
     print("bombena")
+    print("endFileNames:::")
 
     try:
         # Check whether the file exists in the cache
@@ -69,7 +80,7 @@ while 1:
             try:
                 # Connect to the socket to port 80
                 # Fill in start.
-                c.connect((hostn, 80))
+                c.connect((hostn.partition('/')[0], 80))
                 # Fill in end.
 
                 # Create a temporary file on this socket and ask port 80 for the file requested by the client
@@ -83,7 +94,22 @@ while 1:
 
                 # Create a new file in the cache for the requested file.
                 # Also send the response in the buffer to client socket and the corresponding file in the cache
-                tmpFile = open("./" + filename, "wb")
+
+                directoryList = filename.split('/')
+                filepath = ""
+                if (len(directoryList) >= 2) :
+                    for directory in directoryList[0:-1]:
+                        directory += "folder"
+                        filepath += directory
+                        if not os.path.exists(filepath):
+                            os.makedirs(filepath)
+                            print("Directory created:", directory)
+                        else:
+                            print("Directory already exists:", directory)
+                        filepath += '/'
+
+                filepath += directoryList[-1].replace('?', '-&-')
+                tmpFile = open("./" + filepath, "wb")
 
                 # Fill in start.
                 tmpFile.write(buffer)
