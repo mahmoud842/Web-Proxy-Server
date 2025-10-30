@@ -39,6 +39,7 @@ while 1:
         filename = filename[1:]
     if (filename[-1] == '/'):
         filename = filename[0:-1]
+        
     print("fileNames:::")
     print(filename)
     print("bombena")
@@ -48,23 +49,40 @@ while 1:
     print("bombena")
     print("endFileNames:::")
 
+    directoryList = filename.split('/')
+    filepath = ""
+    if (len(directoryList) >= 2) :
+        for directory in directoryList[0:-1]:
+            directory += "folder"
+            filepath += directory
+            if not os.path.exists(filepath):
+                os.makedirs(filepath)
+                print("Directory created:", directory)
+            else:
+                print("Directory already exists:", directory)
+            filepath += '/'
+
+    filepath += directoryList[-1].replace('?', '-&-')
+
+    print(filepath)
+
     try:
         # Check whether the file exists in the cache
-        f = open(filetouse[1:], "r")
+        f = open(filepath, "rb")
         outputdata = f.readlines()
         fileExist = "true"
 
         # ProxyServer finds a cache hit and generates a response message
-        tcpCliSock.send("HTTP/1.0 200 OK\r\n".encode())
-        tcpCliSock.send("Content-Type:text/html\r\n".encode())
+        # tcpCliSock.send("HTTP/1.0 200 OK\r\n".encode())
+        # tcpCliSock.send("Content-Type:text/html\r\n".encode())
 
         # Fill in start.
         for line in outputdata:
-            tcpCliSock.send(line.encode())
+            tcpCliSock.send(line)
         f.close()
         # Fill in end.
 
-        print('Read from cache')
+        print("\033[32m" + "cache hit" + "\033[0m")
 
     # Error handling for file not found in cache
     except IOError:
@@ -95,20 +113,7 @@ while 1:
                 # Create a new file in the cache for the requested file.
                 # Also send the response in the buffer to client socket and the corresponding file in the cache
 
-                directoryList = filename.split('/')
-                filepath = ""
-                if (len(directoryList) >= 2) :
-                    for directory in directoryList[0:-1]:
-                        directory += "folder"
-                        filepath += directory
-                        if not os.path.exists(filepath):
-                            os.makedirs(filepath)
-                            print("Directory created:", directory)
-                        else:
-                            print("Directory already exists:", directory)
-                        filepath += '/'
-
-                filepath += directoryList[-1].replace('?', '-&-')
+                print("\033[31m" + "cache miss" + "\033[0m")
                 tmpFile = open("./" + filepath, "wb")
 
                 # Fill in start.
