@@ -7,6 +7,7 @@ if len(sys.argv) <= 1:
 
 # Create a server socket, bind it to a port and start listening
 tcpSerSock = socket(AF_INET, SOCK_STREAM)
+
 # Fill in start.
 tcpSerSock.bind((sys.argv[1], 8888))
 tcpSerSock.listen(1)
@@ -24,12 +25,10 @@ while 1:
 
     print(message)
     print("bombena")
+    
     # Extract the filename from the given message
-    try:
-        filename = message.split()[1].partition("/")[2]
-    except IndexError:
-        tcpCliSock.close()
-        continue
+    print(message.split()[1])
+    filename = message.split()[1].partition("/")[2]
 
     print(filename)
     print("bombena")
